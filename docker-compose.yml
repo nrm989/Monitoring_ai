@@ -34,7 +34,7 @@ services:
       GF_SECURITY_ADMIN_PASSWORD: admin
       GF_USERS_ALLOW_SIGN_UP: "false"
       # Alertes mail via Gmail (identifiants lus depuis .env : SMTP_USER / SMTP_PASS / MAIL_TO)
-      # Port 587 + STARTTLS (le port 465 de .env reste utilisé par report.py uniquement)
+      # Port 587 + STARTTLS (SMTP_PORT du .env n'est plus utilisé)
       GF_SMTP_ENABLED: "true"
       GF_SMTP_HOST: "smtp.gmail.com:587"
       GF_SMTP_USER: "${SMTP_USER}"
