@@ -19,6 +19,21 @@ targets:
       # contenant au moins un de ces mots (vide = pas de contrainte contenu)
       expect_contains: "Idarati,assistant,Bonjour"
 
+  - name: "Meeting Assistant"
+    url: "https://meeting.ai.mmsp.gov.ma/"
+    keyword: "transcription"  # SPA : mot ASCII sûr présent dans la meta description
+    timeout: 20
+
+  - name: "PDF Assistant"
+    url: "https://pdf.ai.mmsp.gov.ma/"
+    keyword: "Sovereign"  # titre réel "Sovereign Document Suite" (constaté au retour en ligne)
+    timeout: 20
+
+  - name: "BO Recherche"
+    url: "https://bo.ai.mmsp.gov.ma/"
+    keyword: "/assets/"  # SPA : coquille HTML + référence au bundle JS
+    timeout: 20
+
 settings:
   history_csv: "data/history.csv"
   latest_json: "data/latest.json"

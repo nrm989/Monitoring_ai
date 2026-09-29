@@ -1,0 +1,35 @@
+groups:
+  - name: websites
+    interval: 30s
+    rules:
+      - alert: WebsiteDown
+        expr: website_up == 0
+        for: 1m
+        labels:
+          severity: critical
+        annotations:
+          summary: "{{ $labels.site }} DOWN ({{ $labels.url }})"
+
+      - alert: ChatbotKO
+        expr: website_chat_ok == 0
+        for: 2m
+        labels:
+          severity: critical
+        annotations:
+          summary: "Chatbot {{ $labels.site }} ne répond pas à Bonjour"
+
+      - alert: SSLExpiringSoon
+        expr: website_ssl_days_left < 30 and website_ssl_days_left >= 0
+        for: 5m
+        labels:
+          severity: warning
+        annotations:
+          summary: "SSL {{ $labels.site }} expire dans {{ $value }} jours"
+
+      - alert: SlowWebsite
+        expr: website_response_time_seconds > 30
+        for: 5m
+        labels:
+          severity: warning
+        annotations:
+          summary: "{{ $labels.site }} lent : {{ $value }}s"

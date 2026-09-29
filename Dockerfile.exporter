@@ -1,0 +1,9 @@
+FROM python:3.11-slim
+WORKDIR /app
+COPY requirements.txt .
+RUN pip install --no-cache-dir -r requirements.txt
+COPY monitor.py config.yaml exporter.py ./
+ENV SCRAPE_INTERVAL=30
+ENV EXPORTER_PORT=8000
+EXPOSE 8000
+CMD ["python", "exporter.py"]

@@ -46,13 +46,13 @@ def build_html(results: list) -> str:
     all_up = all(r["up"] for r in results)
     title = "✅ Tout est en ligne" if all_up else "🚨 Incident détecté"
     return f"""<html><body style="font-family:Arial,sans-serif">
-    <h2>{title} — Monitoring MMSP / Idarati</h2>
+    <h2>{title} — Monitoring MMSP (5 sites)</h2>
     <table border="1" cellpadding="8" cellspacing="0" style="border-collapse:collapse">
       <tr style="background:#f0f0f0"><th>Service</th><th>État</th><th>HTTP</th>
       <th>Réponse</th><th>SSL</th><th>Sécurité</th><th>Chatbot</th><th>Détail</th></tr>
       {rows}
     </table>
-    <p>Dashboard Streamlit en direct : lancez <code>streamlit run app.py</code><br>
+    <p>Dashboard Grafana : http://localhost:3000 (dashboard « Websites MMSP »)<br>
     Historique complet : <code>data/history.csv</code></p>
     <p><small>Envoyé automatiquement par monitor.py + report.py</small></p>
     </body></html>"""
@@ -82,8 +82,8 @@ def main():
 
     results = json.loads(LATEST.read_text(encoding="utf-8"))
     html = build_html(results)
-    subject = ("✅ [OK] MMSP/Idarati en ligne" if all(r["up"] for r in results)
-               else "🚨 [DOWN] MMSP/Idarati incident")
+    subject = ("[OK] Monitoring MMSP en ligne" if all(r["up"] for r in results)
+               else "[DOWN] Monitoring MMSP incident")
 
     if args.dry_run:
         out = BASE / "data" / "preview.html"

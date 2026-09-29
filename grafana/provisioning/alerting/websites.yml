@@ -1,0 +1,169 @@
+# Provisioning Alerting Grafana : 1 contact mail + 5 règles.
+# $MAIL_TO est substitué depuis le .env du projet.
+apiVersion: 1
+
+contactPoints:
+  - orgId: 1
+    name: email-monitoring
+    receivers:
+      - uid: email-mmsp
+        type: email
+        settings:
+          addresses: $MAIL_TO
+          subject: '[{{ .Status | toUpper }}] Monitoring MMSP : {{ .GroupLabels.alertname }}'
+          singleEmail: true
+        disableResolveMessage: false
+
+policies:
+  - orgId: 1
+    receiver: email-monitoring
+    group_by: [alertname, site]
+    group_wait: 30s
+    group_interval: 5m
+    repeat_interval: 4h
+
+groups:
+  - orgId: 1
+    name: websites
+    folder: Websites
+    interval: 1m
+    rules:
+      - uid: website-down
+        title: "Site DOWN"
+        condition: C
+        data:
+          - refId: A
+            relativeTimeRange: {from: 600, to: 0}
+            datasourceUid: prometheus
+            model: {expr: "website_up == 0", refId: A, range: true}
+          - refId: C
+            relativeTimeRange: {from: 0, to: 0}
+            datasourceUid: __expr__
+            model:
+              conditions:
+                - evaluator: {params: [0], type: gt}
+                  operator: {type: and}
+                  query: {params: [A]}
+                  reducer: {params: [], type: last}
+                  type: query
+              refId: C
+              type: classic_conditions
+        for: 1m
+        noDataState: OK
+        execErrState: Error
+        labels: {severity: critical}
+        annotations:
+          summary: "DOWN : {{ $labels.site }} ({{ $labels.url }})"
+          description: "Le site {{ $labels.site }} ne répond plus au check HTTP. Vérifiez le dashboard Grafana puis lancez python monitor.py pour le détail (code HTTP, erreur réseau)."
+
+      - uid: chatbot-bonjour-ko
+        title: "Chatbot ne répond plus à Bonjour"
+        condition: C
+        data:
+          - refId: A
+            relativeTimeRange: {from: 600, to: 0}
+            datasourceUid: prometheus
+            model: {expr: "website_chat_ok == 0", refId: A, range: true}
+          - refId: C
+            relativeTimeRange: {from: 0, to: 0}
+            datasourceUid: __expr__
+            model:
+              conditions:
+                - evaluator: {params: [0], type: gt}
+                  operator: {type: and}
+                  query: {params: [A]}
+                  reducer: {params: [], type: last}
+                  type: query
+              refId: C
+              type: classic_conditions
+        for: 2m
+        noDataState: OK
+        execErrState: Error
+        labels: {severity: critical}
+        annotations:
+          summary: "Chatbot KO : {{ $labels.site }} ne répond plus à « Bonjour »"
+          description: "La page répond (HTTP 200) mais le test POST /api/agent/chat échoue. Voir le panneau « Réponse du chatbot » dans Grafana pour l'extrait d'erreur."
+
+      - uid: contenu-inattendu
+        title: "Contenu inattendu (page blanche ?)"
+        condition: C
+        data:
+          - refId: A
+            relativeTimeRange: {from: 600, to: 0}
+            datasourceUid: prometheus
+            model: {expr: "website_keyword_ok == 0", refId: A, range: true}
+          - refId: C
+            relativeTimeRange: {from: 0, to: 0}
+            datasourceUid: __expr__
+            model:
+              conditions:
+                - evaluator: {params: [0], type: gt}
+                  operator: {type: and}
+                  query: {params: [A]}
+                  reducer: {params: [], type: last}
+                  type: query
+              refId: C
+              type: classic_conditions
+        for: 2m
+        noDataState: OK
+        execErrState: Error
+        labels: {severity: warning}
+        annotations:
+          summary: "Contenu inattendu : {{ $labels.site }}"
+          description: "Le site répond HTTP 200 mais le mot-clé attendu est absent du HTML (page blanche, déploiement cassé ou refonte front)."
+
+      - uid: ssl-expire-bientot
+        title: "Certificat SSL expire bientôt"
+        condition: C
+        data:
+          - refId: A
+            relativeTimeRange: {from: 600, to: 0}
+            datasourceUid: prometheus
+            model: {expr: "website_ssl_days_left < 30", refId: A, range: true}
+          - refId: C
+            relativeTimeRange: {from: 0, to: 0}
+            datasourceUid: __expr__
+            model:
+              conditions:
+                - evaluator: {params: [0], type: gt}
+                  operator: {type: and}
+                  query: {params: [A]}
+                  reducer: {params: [], type: last}
+                  type: query
+              refId: C
+              type: classic_conditions
+        for: 5m
+        noDataState: OK
+        execErrState: OK
+        labels: {severity: warning}
+        annotations:
+          summary: "SSL {{ $labels.site }} : {{ $value }} jours restants"
+          description: "Le certificat SSL expire dans moins de 30 jours. Prévoyez le renouvellement avant la coupure HTTPS."
+
+      - uid: site-lent
+        title: "Site lent"
+        condition: C
+        data:
+          - refId: A
+            relativeTimeRange: {from: 600, to: 0}
+            datasourceUid: prometheus
+            model: {expr: "website_response_time_seconds > 30", refId: A, range: true}
+          - refId: C
+            relativeTimeRange: {from: 0, to: 0}
+            datasourceUid: __expr__
+            model:
+              conditions:
+                - evaluator: {params: [0], type: gt}
+                  operator: {type: and}
+                  query: {params: [A]}
+                  reducer: {params: [], type: last}
+                  type: query
+              refId: C
+              type: classic_conditions
+        for: 5m
+        noDataState: OK
+        execErrState: OK
+        labels: {severity: warning}
+        annotations:
+          summary: "Lent : {{ $labels.site }} répond en {{ $value }}s"
+          description: "Temps de réponse HTTP supérieur à 30 secondes pendant plus de 5 minutes."

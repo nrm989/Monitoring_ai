@@ -1,0 +1,333 @@
+{
+  "title": "Websites MMSP (5 sites)",
+  "uid": "websites-mmsp-idarati",
+  "timezone": "browser",
+  "schemaVersion": 39,
+  "version": 5,
+  "panels": [
+    {
+      "id": 1,
+      "title": "Etat actuel (UP=1 / DOWN=0)",
+      "type": "stat",
+      "gridPos": {
+        "x": 0,
+        "y": 0,
+        "w": 24,
+        "h": 4
+      },
+      "targets": [
+        {
+          "datasource": {
+            "type": "prometheus"
+          },
+          "expr": "website_up",
+          "refId": "A",
+          "legendFormat": "{{site}}"
+        }
+      ],
+      "options": {
+        "orientation": "auto",
+        "textMode": "value_and_name",
+        "colorMode": "value",
+        "graphMode": "none",
+        "justifyMode": "center"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "thresholds": {
+            "steps": [
+              {
+                "value": 0,
+                "color": "red"
+              },
+              {
+                "value": 0.5,
+                "color": "green"
+              }
+            ]
+          }
+        }
+      }
+    },
+    {
+      "id": 2,
+      "title": "Temps de réponse HTTP (s)",
+      "type": "timeseries",
+      "gridPos": {
+        "x": 0,
+        "y": 4,
+        "w": 12,
+        "h": 6
+      },
+      "targets": [
+        {
+          "datasource": {
+            "type": "prometheus"
+          },
+          "expr": "website_response_time_seconds",
+          "refId": "A",
+          "legendFormat": "{{site}}"
+        }
+      ]
+    },
+    {
+      "id": 3,
+      "title": "Chatbot Idarati — test Bonjour (1=OK / 0=KO)",
+      "type": "stat",
+      "gridPos": {
+        "x": 0,
+        "y": 10,
+        "w": 24,
+        "h": 4
+      },
+      "targets": [
+        {
+          "datasource": {
+            "type": "prometheus"
+          },
+          "expr": "website_chat_ok{site=\"Chatbot Idarati\"}",
+          "refId": "A",
+          "legendFormat": "{{site}}"
+        }
+      ],
+      "options": {
+        "orientation": "auto",
+        "textMode": "value_and_name",
+        "colorMode": "value",
+        "graphMode": "none",
+        "justifyMode": "center"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "thresholds": {
+            "steps": [
+              {
+                "value": 0,
+                "color": "red"
+              },
+              {
+                "value": 0.5,
+                "color": "green"
+              }
+            ]
+          }
+        }
+      }
+    },
+    {
+      "id": 9,
+      "title": "Réponse du chatbot à « Bonjour »",
+      "type": "table",
+      "gridPos": {
+        "x": 0,
+        "y": 14,
+        "w": 24,
+        "h": 4
+      },
+      "targets": [
+        {
+          "datasource": {
+            "type": "prometheus"
+          },
+          "expr": "website_check_info{site=\"Chatbot Idarati\"}",
+          "refId": "A",
+          "format": "table",
+          "legendFormat": "{{site}}"
+        }
+      ],
+      "transformations": [
+        {
+          "id": "labelsToFields",
+          "options": {}
+        },
+        {
+          "id": "organize",
+          "options": {
+            "includeByName": {
+              "site": true,
+              "chat_preview": true,
+              "chat_error": true
+            },
+            "renameByName": {
+              "site": "Site",
+              "chat_preview": "Réponse Bonjour",
+              "chat_error": "Erreur"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "id": 4,
+      "title": "Temps de réponse chatbot Bonjour (s)",
+      "type": "timeseries",
+      "gridPos": {
+        "x": 12,
+        "y": 4,
+        "w": 12,
+        "h": 6
+      },
+      "targets": [
+        {
+          "datasource": {
+            "type": "prometheus"
+          },
+          "expr": "website_chat_response_time_seconds{site=\"Chatbot Idarati\"}",
+          "refId": "A",
+          "legendFormat": "{{site}}"
+        }
+      ]
+    },
+    {
+      "id": 5,
+      "title": "Jours restants SSL",
+      "type": "stat",
+      "gridPos": {
+        "x": 0,
+        "y": 18,
+        "w": 12,
+        "h": 5
+      },
+      "targets": [
+        {
+          "datasource": {
+            "type": "prometheus"
+          },
+          "expr": "website_ssl_days_left",
+          "refId": "A",
+          "legendFormat": "{{site}}"
+        }
+      ],
+      "options": {
+        "orientation": "auto",
+        "textMode": "value_and_name",
+        "colorMode": "value",
+        "graphMode": "none",
+        "justifyMode": "center"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "thresholds": {
+            "steps": [
+              {
+                "value": 0,
+                "color": "red"
+              },
+              {
+                "value": 30,
+                "color": "yellow"
+              },
+              {
+                "value": 60,
+                "color": "green"
+              }
+            ]
+          }
+        }
+      }
+    },
+    {
+      "id": 6,
+      "title": "Code HTTP (200 vert • 4xx orange • autre rouge)",
+      "type": "stat",
+      "gridPos": {
+        "x": 12,
+        "y": 18,
+        "w": 12,
+        "h": 5
+      },
+      "targets": [
+        {
+          "datasource": {
+            "type": "prometheus"
+          },
+          "expr": "website_status_code",
+          "refId": "A",
+          "legendFormat": "{{site}}"
+        }
+      ],
+      "options": {
+        "orientation": "auto",
+        "textMode": "value_and_name",
+        "colorMode": "value",
+        "graphMode": "none",
+        "justifyMode": "center"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "thresholds": {
+            "steps": [
+              {
+                "value": 0,
+                "color": "red"
+              },
+              {
+                "value": 200,
+                "color": "green"
+              },
+              {
+                "value": 400,
+                "color": "orange"
+              },
+              {
+                "value": 500,
+                "color": "red"
+              }
+            ]
+          },
+          "mappings": [
+            {
+              "type": "value",
+              "options": {
+                "0": {
+                  "text": "Erreur connexion"
+                }
+              }
+            }
+          ]
+        }
+      }
+    },
+    {
+      "id": 8,
+      "title": "Uptime 30j (%) : avg_over_time(website_up[30d])*100",
+      "type": "stat",
+      "gridPos": {
+        "x": 0,
+        "y": 23,
+        "w": 24,
+        "h": 4
+      },
+      "targets": [
+        {
+          "datasource": {
+            "type": "prometheus"
+          },
+          "expr": "avg_over_time(website_up[30d])*100",
+          "refId": "A",
+          "legendFormat": "{{site}}"
+        }
+      ],
+      "options": {
+        "orientation": "auto",
+        "textMode": "value_and_name",
+        "colorMode": "value",
+        "graphMode": "none",
+        "justifyMode": "center"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "value": 0,
+                "color": "green"
+              }
+            ]
+          }
+        }
+      }
+    }
+  ]
+}

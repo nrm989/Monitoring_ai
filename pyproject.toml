@@ -1,9 +1,12 @@
 [project]
 name = "monitoring-ai"
 version = "0.1.0"
-description = "Add your description here"
+description = "Monitoring continu (Prometheus + Grafana) et rapport mail des 5 sites MMSP / Idarati"
 readme = "README.md"
 requires-python = ">=3.10"
 dependencies = [
-    "streamlit>=1.64.0",
+    "requests>=2.31",
+    "pyyaml>=6.0",
+    "python-dotenv>=1.0",
+    "prometheus_client>=0.20",
 ]
