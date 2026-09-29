@@ -1,0 +1,33 @@
+# Sites à monitorer
+targets:
+  - name: "AI Marketplace MMSP"
+    url: "https://ai.mmsp.gov.ma/"
+    keyword: "Marketplace"   # mot attendu dans le HTML, vide = pas de check contenu
+    timeout: 20
+
+  - name: "Chatbot Idarati"
+    url: "https://chatbot.idarati.ma/"
+    keyword: "Assistant"     # page actuelle très légère (441 octets) -> on vérifie juste 200
+    timeout: 20
+    functional_test:
+      # Test bout-en-bout : le front appelle GET /api/agent/session puis POST /api/agent/chat (SSE)
+      enabled: true
+      base_url: "https://chatbot.idarati.ma"
+      message: "Bonjour"
+      timeout: 60
+      # le check est OK si l'événement SSE `done` arrive avec un texte non vide
+      # contenant au moins un de ces mots (vide = pas de contrainte contenu)
+      expect_contains: "Idarati,assistant,Bonjour"
+
+settings:
+  history_csv: "data/history.csv"
+  latest_json: "data/latest.json"
+  user_agent: "MTNRA-monitor/1.0 (+dashboard quotidien)"
+  # Headers de sécurité suivis (score simple)
+  security_headers:
+    - "Strict-Transport-Security"
+    - "Content-Security-Policy"
+    - "X-Content-Type-Options"
+    - "X-Frame-Options"
+    - "Referrer-Policy"
+    - "Permissions-Policy"
